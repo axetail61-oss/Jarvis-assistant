@@ -1,0 +1,158 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JARVIS AI</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: #080808;
+  color: white;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  min-height: 100vh;
+  padding: 35px 18px;
+}
+h1 {
+  color: #ff2020;
+  letter-spacing: 8px;
+  font-size: 36px;
+  text-shadow: 0 0 18px red;
+}
+.status { color: #aaa; margin: 25px; }
+.circle {
+  width: 190px;
+  height: 190px;
+  border: 3px solid #ff2020;
+  border-radius: 50%;
+  margin: 35px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 30px #a00000;
+}
+button {
+  background: #b90000;
+  border: 1px solid red;
+  color: white;
+  padding: 16px 25px;
+  border-radius: 10px;
+  font-size: 17px;
+  margin: 8px;
+}
+button:active { background: red; }
+input {
+  width: 85%;
+  padding: 14px;
+  background: #171717;
+  border: 1px solid red;
+  color: white;
+  border-radius: 8px;
+  font-size: 16px;
+}
+#response {
+  color: #ff5555;
+  margin: 25px auto;
+  max-width: 500px;
+  min-height: 50px;
+}
+.small { color: #777; font-size: 12px; }
+</style>
+</head>
+<body>
+
+<h1>J.A.R.V.I.S.</h1>
+<p>JUST A RATHER VERY INTELLIGENT SYSTEM</p>
+<div class="status" id="status">SYSTEM ONLINE</div>
+
+<div class="circle">
+  <div style="color:red;font-size:25px;">J.A.R.V.I.S.</div>
+</div>
+
+<button onclick="listen()">🎙 ACTIVATE JARVIS</button>
+
+<br><br>
+<input id="command" placeholder="Type a command...">
+<button onclick="sendCommand()">SEND</button>
+
+<div id="response">Awaiting your command, Boss.</div>
+<p class="small">JARVIS WEB EDITION 1.0</p>
+
+<script>
+const statusText = document.getElementById("status");
+const response = document.getElementById("response");
+
+function speak(text) {
+  response.textContent = text;
+  speechSynthesis.cancel();
+  const voice = new SpeechSynthesisUtterance(text);
+  voice.rate = 0.9;
+  voice.pitch = 0.8;
+  voice.lang = "en-US";
+  speechSynthesis.speak(voice);
+}
+
+function answer(command) {
+  const c = command.toLowerCase();
+
+  if (c.includes("hello") || c.includes("hey")) {
+    speak("Hello, Boss. JARVIS is online and ready.");
+  } else if (c.includes("your name")) {
+    speak("I am JARVIS, your personal assistant.");
+  } else if (c.includes("time")) {
+    speak("The time is " + new Date().toLocaleTimeString());
+  } else if (c.includes("date")) {
+    speak("Today is " + new Date().toDateString());
+  } else if (c.includes("joke")) {
+    speak("Why did the computer get cold? It left its Windows open.");
+  } else if (c.includes("thank")) {
+    speak("You're welcome, Boss. Always at your service.");
+  } else if (c.includes("stop")) {
+    speechSynthesis.cancel();
+    speak("Standing by, Boss.");
+  } else {
+    speak("I heard you say " + command +
+    ". I am still learning, Boss.");
+  }
+}
+
+function sendCommand() {
+  const text = document.getElementById("command").value.trim();
+  if (text) answer(text);
+}
+
+function listen() {
+  const SpeechRecognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  if (!SpeechRecognition) {
+    speak("Voice recognition is not supported in this browser. Please try Chrome.");
+    return;
+  }
+
+  const recognition = new SpeechRecognition();
+  recognition.lang = "en-US";
+  recognition.interimResults = false;
+  recognition.onstart = () => {
+    statusText.textContent = "LISTENING...";
+  };
+  recognition.onresult = (event) => {
+    const words = event.results[0][0].transcript;
+    statusText.textContent = "COMMAND RECEIVED";
+    answer(words);
+  };
+  recognition.onerror = () => {
+    statusText.textContent = "READY";
+    speak("I couldn't hear that, Boss. Please try again.");
+  };
+  recognition.onend = () => {
+    statusText.textContent = "SYSTEM ONLINE";
+  };
+  recognition.start();
+}
+</script>
+
+</body>
+</html>
